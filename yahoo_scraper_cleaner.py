@@ -90,5 +90,10 @@ class Scrapy(object):
                 for g in c.find_all({'div':{'class':'D(ib'}}):
                     for h in g.find_all({'span':{'class':'Trsdu'}}):
                         stats.append(h.text)
-        return(float(stats[3]))
+        try:
+            return(float(stats[3]))
+        except IndexError:
+            #TODO handle the error... nothing is at times returned from the scrape
+            print("we are running the scrape again")
+            self.rtYhoDats()
             

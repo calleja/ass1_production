@@ -39,15 +39,6 @@ class Dialogue(object):
         else:
             print('please select an option')
             self.engageUser()
-    
-    def tradeWorkflow(self):
-        #TODO confirm this method does nothing and delete it
-        buy_trade={'ticker':'CPT','price':98.108,'shares':1000,'timestamp':datetime.datetime.today(),'tradetype':'buy','original_tradetype':'long'}
-        buy_test_today=self.todayTrading.makeTrade(buy_trade,self.act)
-        buy_dict=buy_test_today.tradeType()
-        self.act.postEquityTrade(buy_dict)
-        print(self.act.getPortfolio())
-        print(self.act.cash_bal)
         
     
     def prepareTrade(self):
@@ -117,5 +108,7 @@ class Dialogue(object):
         #call scraper, pass dictionary of current prices to the account object and print the current status of the portfolio dictionary, equipped with both realized and unrealized p+l
         s=scraper.Scrapy()
         ahora=s.rtYhoDats()
+        #TODO handle IndexError in the scrape class
         return(print(self.act.calcUPL(ahora)))
+        
             

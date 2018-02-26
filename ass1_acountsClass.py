@@ -84,7 +84,7 @@ this function will then instantiate a tradeClass object that will QA the trade (
     def calcUPL(self,dictOfPrices):
         #dictOfPrices = output from scrape class; format: {ticker as str:price as float}
         #calc = portfolio for >0 holdings: current market price*shares held - VWAP*shares held 
-        #TODO this assumes that the account object is updated to real time holdings
+        #TODO I need to print the cash position, namely: the USD and sum of cash and notional value of all the current holdings... may need to store it all into a dataframe
         for k,v in self.positions.items():
             #retrieve price
             self.positions[k]['upl']=dictOfPrices[k]*v['shares']-v['vwap']*v['shares']
