@@ -14,8 +14,10 @@ P/L:
     Unrealized p/l, realized p/l
 """
 import sys
-sys.path.append('/home/lechuza/Documents/CUNY/data_607/assignment1/ass1_fromWork')
+import pandas as pd
 sys.path.append('/usr/src/app/PROJECT_FOLDER')
+sys.path.append('/home/lechuza/Documents/CUNY/data_607/assignment1/ass1_fromWork')
+sys.path.append('/home/tio/Documents/CUNY/advancedProgramming/ass1_fromWork')
 import tradeClass as trade
 
 class TradingDay(object):
@@ -50,16 +52,28 @@ class TradingDay(object):
         return(formattedDict)
         
     def logTrade(self,tradeObject):
-        #store all the records onto a large dictionary that needs to persist throughout the trading day... we need to store timestamp, money in/out (available via the "specificTrade" reference variable in "makeTrade"), qty, ticker and direction (buy/sell)
-        #normalize the tradeObject and fit into a list of dictionaries
-        self.tradeLogTup=self.tradeLogTup+(tradeObject,)
+        #store all the records onto a chain of dictionaries contained in a tuple that persists throughout the trading day... we need to store timestamp, money in/out (available via the "specificTrade" reference variable in "makeTrade"), qty, ticker and direction (buy/sell)
+        #append tuples with tup=tup+(newTrade,)
+        self.tradeLogTup=(tradeObject,)+self.tradeLogTup
         #create another function to format the trade list, unless this method is light
         return
     def profitCalc(self):
-        #handle the p+l... will need to decide either LIFO, FIFO or average trade cost... may require pandas or numpy... and even its own class
+        #handle the p+l
         return
     
     def prettyPrintTradeLog(self):
-        return print(self.tradeLogTup)
+        return print(pd.DataFrame(list(self.tradeLogTup)))
+    
+    def sortTrades(self):
+        #place tickers of trades in a pandas df of ticker and timestamp; groupBy ticker and select for the latest timestamp, then sort by timestamp
+        df=pd.DataFrame(list(self.tradeLogTup))
+
+        g=df.groupby('ticker').apply(lambda x: x['execution timesestamp'].max())
+
+        g.sort_values(ascending=False,inplace=True)
+        traded_ticks=g.index.tolist()
+        universe=['AMZN','AAPL','SNAP','INTC','MSFT']
+        [traded_ticks.append(x) for x in universe if x not in traded_ticks]
+        return(list(traded_ticks))
     
         

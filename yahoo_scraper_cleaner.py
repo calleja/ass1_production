@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Exract price and time for the stock
-
-Which stock would you like to trade?\n a - Camden Property Trust / CPT\n b - Delta Airlines / DAL\n c- Apache / APC\n d - Con Edison / ED\n e - Citigroup / C\n
 """
 
 from bs4 import BeautifulSoup as bs
@@ -15,7 +13,7 @@ class Scrapy(object):
     
     def __init__(self):
         
-        self.uni_dic={'CPT':'https://finance.yahoo.com/quote/CPT?p=CPT','ED':'https://finance.yahoo.com/quote/ED?p=ED','DAL':'https://finance.yahoo.com/quote/DAL?p=DAL','APC':'https://finance.yahoo.com/quote/APC?p=APC','C':'https://finance.yahoo.com/quote/C?p=C'}
+        self.uni_dic={'AAPL':'https://finance.yahoo.com/quote/AAPL?p=AAPL','AMZN':'https://finance.yahoo.com/quote/AMZN?p=AMZN','MSFT':'https://finance.yahoo.com/quote/MSFT?p=MSFT','SNAP':'https://finance.yahoo.com/quote/SNAP?p=SNAP','INTC':'https://finance.yahoo.com/quote/INTC?p=INTC'}
         #universe of stocks for our purposes
         
     def rtYhoDats(self,stocks=None):
@@ -77,7 +75,9 @@ class Scrapy(object):
         
     def lowerParse(self,price_text):
         price=re.search(r'.*?(?: )',price_text)
-        price_float=float(price.group(0))
+        precio=price.group(0)
+        new_price=float(precio.replace(",",""))
+        price_float=new_price
         return(price_float)
         
     def parseTextForPortfolio(self,extract):
@@ -90,5 +90,8 @@ class Scrapy(object):
                 for g in c.find_all({'div':{'class':'D(ib'}}):
                     for h in g.find_all({'span':{'class':'Trsdu'}}):
                         stats.append(h.text)
-        return(float(stats[3]))
+        precio=stats[3]
+        new_price=float(precio.replace(",",""))
+        price_float=new_price                        
+        return(price_float)
             

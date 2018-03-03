@@ -7,12 +7,18 @@ This object will have attributes like cash and positions and will need to allow 
 Positions must store total shares, average price, possibly VWAP
 In addition, store cash amount; keep in mind that short positions do not affect cash balance.
 """
+import pandas as pd
 
 class Account:
     def __init__(self):
         self.cash_bal=1000000
         #will be a nested dictionary, the outermost key is the ticker and the value will be a dictionary of total shares, average price and possibly VWAP, realized p/l... ex: {ticker:{'notional':notaionValue,'direction':direction_string, etc...}}
-        self.positions={}
+        self.positions={'AAPL':{'shares':0,'vwap':0,'realized_pl':0,'notional':0,'original_direction':'','upl':0},
+                        'INTC':{'shares':0,'vwap':0,'realized_pl':0,'notional':0,'original_direction':'','upl':0},
+                        'MSFT':{'shares':0,'vwap':0,'realized_pl':0,'notional':0,'original_direction':'','upl':0},
+                        'SNAP':{'shares':0,'vwap':0,'realized_pl':0,'notional':0,'original_direction':'','upl':0},
+                        'AMZN':{'shares':0,'vwap':0,'realized_pl':0,'notional':0,'original_direction':'','upl':0}}
+        
         
     def getCash(self):
         print('cash balance is :'+str(self.cash_bal))
@@ -24,9 +30,6 @@ class Account:
     def updateTickersOwned(self):
         #could also just get the keys from the dictionary
         self.tickers=self.position.keys()
-            
-    def amend_cash(self,amend):
-        self.cash=self.cash+amend
         
     def checkIfNew(self,dic):
         #checks whether there is a position in that stock and in the same direction
@@ -56,12 +59,21 @@ this function will then instantiate a tradeClass object that will QA the trade (
         else: #pre-existing position in the stock
             self.calcVWAP(dic) #function will determine whether VWAP is to be impacted, and if so, will update it
             self.calcRealizedPL(dic) #calclates realized PL if applicable
+            #calculate the number of shares in portfolio
         self.positions[dic['ticker']]['shares']=dic['position_delta']+self.positions[dic['ticker']]['shares']    
+        #calculate notional of shares held
         self.positions[dic['ticker']]['notional']=self.positions[dic['ticker']]['shares']*self.positions[dic['ticker']]['vwap']
+        #calculate the cash position after the trade
         self.cash_bal=dic['cash_delta']+self.cash_bal
         
-        #how to keep track of "new" trades - tracking the genesis trade
-        self.positions[dic['ticker']]['original_direction']=dic['original_tradetype']
+        #tracking the original_tradetype
+        
+        #clean up the portfolio if there are no positions
+        if self.positions[dic['ticker']]['shares']==0:
+            self.positions[dic['ticker']]['original_direction']=''
+            self.positions[dic['ticker']]['vwap']=0
+        else:
+            self.positions[dic['ticker']]['original_direction']=dic['original_tradetype']
         #updat self.positions[ticker]['realized_pl'] with another application
 
     def calcVWAP(self,dic):
@@ -72,6 +84,9 @@ this function will then instantiate a tradeClass object that will QA the trade (
         if(self.positions[dic['ticker']]['original_direction']==dic['original_tradetype'] and  abs(self.positions[dic['ticker']]['shares']+dic['position_delta'])>abs(self.positions[dic['ticker']]['shares'])):
             newVWAP=(self.positions[dic['ticker']]['notional']+dic['notional_delta'])/(self.positions[dic['ticker']]['shares']+dic['position_delta'])
             self.positions[dic['ticker']]['vwap']=newVWAP
+        elif (self.positions[dic['ticker']]['vwap']==0 and  abs(self.positions[dic['ticker']]['shares']+dic['position_delta'])>=abs(self.positions[dic['ticker']]['shares'])):
+            newVWAP=(self.positions[dic['ticker']]['notional']+dic['notional_delta'])/(self.positions[dic['ticker']]['shares']+dic['position_delta'])
+            self.positions[dic['ticker']]['vwap']=newVWAP    
         else:
             return
         
@@ -81,11 +96,29 @@ this function will then instantiate a tradeClass object that will QA the trade (
             #'notional_delta' is negative for sales
             self.positions[dic['ticker']]['realized_pl']=-dic['notional_delta']+self.positions[dic['ticker']]['vwap']*dic['position_delta']+self.positions[dic['ticker']]['realized_pl']
             
-    def calcUPL(self,dictOfPrices):
+    def calcUPL(self,dictOfPrices,sortedList):
         #dictOfPrices = output from scrape class; format: {ticker as str:price as float}
-        #calc = portfolio for >0 holdings: current market price*shares held - VWAP*shares held 
-        #TODO this assumes that the account object is updated to real time holdings
+        #calc = portfolio for >0 holdings: current market price*shares held - VWAP*shares held  
+        total_notional=0
+        
         for k,v in self.positions.items():
             #retrieve price
             self.positions[k]['upl']=dictOfPrices[k]*v['shares']-v['vwap']*v['shares']
-        return(self.positions)
+            g=dictOfPrices[k]*v['shares']
+            self.positions[k]['notional']=g
+            total_notional+=g 
+         
+         #calculate the total size of portfolio: cash + notional
+        self.portfolio_value=self.cash_bal+total_notional
+        cash_line=(self.cash_bal,self.portfolio_value)
+        sorted_df=self.sortPositions(sortedList) 
+        print(sorted_df)
+        #TODO cash_line will need to conform to the table structure: with index "cash" and blank values for WAP, UPL and RPL... ensure that RPL persists after the position in the stock was liquidated
+        print(cash_line)
+    
+    def sortPositions(self,sortedList):
+        df=pd.DataFrame.from_dict(self.positions,orient='index')
+        #sort the dataframe by its index
+        return(df.reindex(sortedList))
+        
+        

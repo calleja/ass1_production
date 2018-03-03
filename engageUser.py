@@ -4,8 +4,9 @@
 Client dialogue
 """
 import sys
-sys.path.append('/home/lechuza/Documents/CUNY/data_607/assignment1/ass1_fromWork')
 sys.path.append('/usr/src/app/PROJECT_FOLDER')
+sys.path.append('/home/lechuza/Documents/CUNY/data_607/assignment1/ass1_fromWork')
+sys.path.append('/home/tio/Documents/CUNY/advancedProgramming/ass1_fromWork')
 import tradeClass as trade
 import ass1_acountsClass as accts
 import datetime as datetime
@@ -19,7 +20,7 @@ class Dialogue(object):
         self.act=accts.Account()
     
     def engageUser(self):
-        menuSelection=input('Please select from the list of options below.\n a -Trade\n b - Show Blotter\n c- Show P/L\n d - Quit\n')
+        menuSelection=input('Please select from the list of options below.\n a -Trade\n b - Show Blotter\n c- Show P/L\n d - Quit\n > ')
         if menuSelection=='a':
             self.prepareTrade()
         elif menuSelection=='b':
@@ -29,10 +30,10 @@ class Dialogue(object):
             print(self.todayTrading.prettyPrintTradeLog())
             return(self.engageUser())
         elif menuSelection=='c':
-            #TODO call the pl class
+            
             print('your current portfolio is below... p&l calc is pending')
             self.calcPL()
-            #TODO call the scraper on entire universe of stocks and send over to accounts API
+            
             return self.engageUser()
         elif menuSelection=='d':
             return
@@ -40,21 +41,12 @@ class Dialogue(object):
             print('please select an option')
             self.engageUser()
     
-    def tradeWorkflow(self):
-        #TODO confirm this method does nothing and delete it
-        buy_trade={'ticker':'CPT','price':98.108,'shares':1000,'timestamp':datetime.datetime.today(),'tradetype':'buy','original_tradetype':'long'}
-        buy_test_today=self.todayTrading.makeTrade(buy_trade,self.act)
-        buy_dict=buy_test_today.tradeType()
-        self.act.postEquityTrade(buy_dict)
-        print(self.act.getPortfolio())
-        print(self.act.cash_bal)
-        
     
     def prepareTrade(self):
             agg_dic={}            
             #dictionary of trade stats to send over to the tradeClass
-            stockTrade=input('Which stock would you like to trade?\n a - Camden Property Trust / CPT\n b - Delta Airlines / DAL\n c- Apache / APC\n d - Con Edison / ED\n e - Citigroup / C\n')
-            stock_dic={'a':'CPT','b':'DAL','c':'APC','d':'ED','e':'C'}
+            stockTrade=input('Which stock would you like to trade?\n a - Apple / AAPL\n b - Amazon / AMZN\n c- Microsoft / MSFT\n d - Snap Chat / SNAP\n e - Intel Corp / INTC\n > ')
+            stock_dic={'a':'AAPL','b':'AMZN','c':'MSFT','d':'SNAP','e':'INTC'}
             try:
                 #store ticker symbol in the final dictionary
                 agg_dic['ticker']=stock_dic[stockTrade]
@@ -63,7 +55,7 @@ class Dialogue(object):
                 #start over
                 self.engageUser()
             
-            tradeDirection=input('Would you like to\n a- buy\n b- sell to close\n c -short\n d- buy to close?\n') #drives whether we calculate using bid or ask
+            tradeDirection=input('Would you like to\n a- buy\n b- sell to close\n c -short\n d- buy to close?\n > ') #drives whether we calculate using bid or ask
             
             #a lookup dictionary
             options={'a':'buy','b':'sell to close','c':'short','d':'buy to close'}
@@ -75,7 +67,7 @@ class Dialogue(object):
                 print('incorrect selection')
                 self.engageUser()
                 
-            qty=float(input('How many shares would you like to trade?\n'))
+            qty=float(input('How many shares would you like to trade?\n > '))
             agg_dic['shares']=qty    
             agg_dic['timestamp']=datetime.datetime.now()
             #call the yahoo scraper... then call TradeManager which calls TradeClass... actually - have the option to call the yahoo scraper from the TradeManager object.
@@ -87,7 +79,7 @@ class Dialogue(object):
             agg_dic['price']=price_dict[stock_dic[stockTrade]][map_bid_ask[tradeDirection]]
             
             #The user is then asked to confirm the trade at the market ask price scraped from Yahoo.
-            cont=input('You can transact at {}. Would you like to continue y/n?\n'.format(agg_dic['price']))
+            cont=input('You can transact at {}. Would you like to continue y/n?\n > '.format(agg_dic['price']))
             
             if cont=='y':
                 #send over this data to the tradeClass or can return a dictionary
@@ -117,5 +109,6 @@ class Dialogue(object):
         #call scraper, pass dictionary of current prices to the account object and print the current status of the portfolio dictionary, equipped with both realized and unrealized p+l
         s=scraper.Scrapy()
         ahora=s.rtYhoDats()
-        return(print(self.act.calcUPL(ahora)))
+        sorted_list=self.todayTrading.sortTrades()
+        return(print(self.act.calcUPL(ahora,sorted_list)))
             

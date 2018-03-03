@@ -5,8 +5,9 @@ This class QAs the trade, makes calculations based on tradetype... trades are to
 """
 import sys
 #these paths will later need to be edited and matched with the imported/downloaded git folder
-sys.path.append('/home/lechuza/Documents/CUNY/data_607/assignment1/ass1_fromWork')
 sys.path.append('/usr/src/app/PROJECT_FOLDER')
+sys.path.append('/home/lechuza/Documents/CUNY/data_607/assignment1/ass1_fromWork')
+sys.path.append('/home/tio/Documents/CUNY/advancedProgramming/ass1_fromWork')
 #import ass1_acountsClass as acct
 
 class EquityTrade():
@@ -25,6 +26,9 @@ class EquityTrade():
     def qaTrade(self,result_set):
         #ensure that the trade makes sense given the current holdings in the portfolio... return a True or False... True will allow the transaction to make all the proper updates, while a False should prompt the user that the transaction is not allowed given the current holdings
         if self.tradetype=='buy':
+            #cash_delta is <0 for trades to buy
+            print('cash_delta of trade: '+str(result_set['cash_delta']))
+            print('portfolio cash position: '+str(self.currentPortfolio.cash_bal))
             if result_set['cash_delta']+self.currentPortfolio.cash_bal<0:
                 return False
             else:
