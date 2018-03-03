@@ -41,7 +41,6 @@ class Dialogue(object):
             print('please select an option')
             self.engageUser()
     
-    
     def prepareTrade(self):
             agg_dic={}            
             #dictionary of trade stats to send over to the tradeClass
