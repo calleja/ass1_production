@@ -54,12 +54,11 @@ class Dialogue(object):
                 print('incorrect selection')
                 #start over
                 self.engageUser()
-            
-            tradeDirection=input('Would you like to\n a- buy\n b- sell to close\n c -short\n d- buy to close?\n > ') #drives whether we calculate using bid or ask
+            tradeDirection=input('Would you like to\n a- buy\n b- sell to close\n > ')
+            #tradeDirection=input('Would you like to\n a- buy\n b- sell to close\n c -short\n d- buy to close?\n > ') #drives whether we calculate using bid or ask
             
             #a lookup dictionary
-            options={'a':'buy','b':'sell to close'}
-            # original: options={'a':'buy','b':'sell to close','c':'short','d':'buy to close'}
+            options={'a':'buy','b':'sell to close','c':'short','d':'buy to close'}
             
             try:
                 #store tradetype entry in the final dictionary
