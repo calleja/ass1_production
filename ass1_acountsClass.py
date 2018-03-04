@@ -110,7 +110,7 @@ this function will then instantiate a tradeClass object that will QA the trade (
          
          #calculate the total size of portfolio: cash + notional
         self.portfolio_value=self.cash_bal+total_notional
-        cash_line=(self.cash_bal,self.portfolio_value)
+        cash_line=('cash',self.cash_bal,self.portfolio_value)
         sorted_df=self.sortPositions(sortedList) 
         print(sorted_df)
         #TODO cash_line will need to conform to the table structure: with index "cash" and blank values for WAP, UPL and RPL... ensure that RPL persists after the position in the stock was liquidated

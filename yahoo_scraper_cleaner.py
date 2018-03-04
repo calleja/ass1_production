@@ -90,16 +90,8 @@ class Scrapy(object):
                 for g in c.find_all({'div':{'class':'D(ib'}}):
                     for h in g.find_all({'span':{'class':'Trsdu'}}):
                         stats.append(h.text)
-<<<<<<< HEAD
-        
-        try:
-            precio=stats[3]
-            new_price=float(precio.replace(",",""))
-            price_float=new_price                        
-            return(price_float)
-        except IndexError:
-            #TODO handle the error... nothing is at times returned from the scrape
-            print("we are running the scrape again")
-            self.rtYhoDats()
-
+        precio=stats[3]
+        new_price=float(precio.replace(",",""))
+        price_float=new_price                        
+        return(price_float)
             

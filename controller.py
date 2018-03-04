@@ -6,7 +6,7 @@ Controller class for the trading application
 
 import sys
 sys.path.append('/home/lechuza/Documents/CUNY/data_607/assignment1/ass1_fromWork')
-#sys.path.append('/home/tio/Documents/CUNY/advancedProgramming/ass1_fromWork')
+sys.path.append('/home/tio/Documents/CUNY/advancedProgramming/ass1_fromWork')
 import tradeClass as trade
 import ass1_acountsClass as accts
 import datetime as datetime
@@ -14,6 +14,7 @@ import tradeManager as tm
 import engageUser as eu
 import yahoo_scraper_cleaner as scraper
 import pandas as pd
+import pprint
 from imp import reload
 
 reload(trade)
@@ -85,23 +86,41 @@ engage.act.getPortfolio()
 engage.act.cash_bal
 ''' test the scraper function '''
 s=scraper.Scrapy()
-ahora=s.rtYhoDats()
-test=s.rtYhoDats('APC')
+amzn=s.rtYhoDats('AMZN')
+todo=s.rtYhoDats()
 
 one_dic={'side':'buy','ticker':'APC','quantity':1000,'executed price':67.89,'execution timestamp':datetime.datetime.strptime('2016-01-01',"%Y-%m-%d"),'original_tradetype':'long','position_delta':1000}
 one_dic.keys()
 ''' test the p&l class '''
 #version with no short positions... is qty neg or positive?
 fakeTrades1=(
-{'side':'buy','ticker':'APC','quantity':1000,'executed price':67.89,'execution timestamp':datetime.datetime.strptime('2016-01-01',"%Y-%m-%d"),'original_tradetype':'long','position_delta':1000},
+{'side':'buy','ticker':'INTC','quantity':1000,'executed price':67.89,'execution timestamp':datetime.datetime.strptime('2016-01-01',"%Y-%m-%d"),'original_tradetype':'long','position_delta':1000},
 {'side':'buy','ticker':'DAL','quantity':400,'executed price':89.23,'execution timestamp':datetime.datetime.strptime('2016-01-01',"%Y-%m-%d"),'original_tradetype':'long','position_delta':400},
-{'side':'sell to close','ticker':'APC','quantity':500,'executed price':69.8,'execution timestamp':datetime.datetime.strptime('2017-01-01',"%Y-%m-%d"),'original_tradetype':'long','position_delta':-500},
-{'side':'buy','ticker':'DAL','quantity':200,'executed price':65,'execution timestamp':datetime.datetime.now(),'original_tradetype':'long','position_delta':200},
+{'side':'sell to close','ticker':'AAPL','quantity':500,'executed price':69.8,'execution timestamp':datetime.datetime.strptime('2017-01-01',"%Y-%m-%d"),'original_tradetype':'long','position_delta':-500},
+{'side':'buy','ticker':'AAPL','quantity':200,'executed price':65,'execution timestamp':datetime.datetime.now(),'original_tradetype':'long','position_delta':200},
 {'side':'sell to close','ticker':'APC','quantity':500,'executed price':62.45,'execution timestamp':datetime.datetime.strptime('2018-01-01',"%Y-%m-%d"),'original_tradetype':'long','position_delta':-500})
 
 df=pd.DataFrame(list(fakeTrades1))
-df.dtypes
-a=df.groupby(['ticker','original_tradetype'])
+df.reindex([0,1,2,3,4,])
+df
+new_order=[2,0,1,4,3]
+df.reindex(new_order)
+df
+
+
+
+def sortTrades(df):
+        #place tickers of trades in a pandas df of ticker and timestamp; groupBy ticker and select for the latest timestamp, then sort by timestamp
+
+        g=df.groupby('ticker').apply(lambda x: x['execution timestamp'].max())
+
+        g.sort_values(ascending=False,inplace=True)
+        traded_ticks=g.index.tolist()
+        universe=['AMZN','AAPL','SNAP','INTC','MSFT']
+        [traded_ticks.append(x) for x in universe if x not in traded_ticks]
+        return(traded_ticks)
+    
+sortTrades(df)
 
 a.groups
 for name, group in a:
@@ -112,9 +131,10 @@ for name, group in a:
 df_test=a.get_group(('APC','long'))    
 
 
-#permutation with open positions
-fakeTrades2=({'side':,'ticker':,'quantity':,'executed price':,'execution timestamp':datetime.datetime.now()},{'side':,'ticker':,'quantity':,'executed price':,'execution timestamp':datetime.datetime.now()},{'side':,'ticker':,'quantity':,'executed price':,'execution timestamp':datetime.datetime.now()},{'side':,'ticker':,'quantity':,'executed price':,'execution timestamp':datetime.datetime.now()},{'side':,'ticker':,'quantity':,'executed price':,'execution timestamp':datetime.datetime.now(),'original_tradetype':)
+positions={'AAPL':{'shares':0,'vwap':0,'realized_pl':0,'notional':0,'original_direction':'','upl':0},
+                        'INTC':{'shares':0,'vwap':0,'realized_pl':0,'notional':0,'original_direction':'','upl':0},
+                        'MSFT':{'shares':0,'vwap':0,'realized_pl':0,'notional':0,'original_direction':'','upl':0},
+                        'SNAP':{'shares':0,'vwap':0,'realized_pl':0,'notional':0,'original_direction':'','upl':0},
+                        'AMZN':{'shares':0,'vwap':0,'realized_pl':0,'notional':0,'original_direction':'','upl':0}}
 
-'''
-{'side':rawDict['tradetype'],'ticker':rawDict['ticker'],'quantity':rawDict['shares'],'executed price':rawDict['price'],'execution timesestamp':rawDict['timestamp'],'money in/out':tradeClassDict['cash_delta']}
-'''
+pd.DataFrame.from_dict(positions,orient='index')
