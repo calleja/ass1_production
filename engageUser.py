@@ -86,14 +86,14 @@ class Dialogue(object):
                 print('Your trade is being processed')
                 #acount object has now been updated at the highest scope
                 #trade.EquityTrade(agg_dic,self.act)
-                print(agg_dic)
+                #print(agg_dic)
                 
                 #TODO discover the error below, an invalid trade is being sent to act.CheckIfNew, but should die at the tradeClass... ensure that the call to makeTrade() encounters the invalid trade error... enforce that the thrown error reaches this object
                 
                 try:
                     single_trade_dic=self.todayTrading.makeTrade(agg_dic,self.act)
                     #makeTrade() calls tradeClass.tradeType() which QAs the trade, determines the original tradetype (long/short) and calculates the delta on position size and imapct to cash
-                    print(single_trade_dic) #TODO printing None
+                    print(single_trade_dic)
                 
                 #TODO this is the portion that is explicitly throwing the error... error states that single_trade_dic is empty
                     self.act.postEquityTrade(single_trade_dic)
