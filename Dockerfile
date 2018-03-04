@@ -16,4 +16,4 @@ RUN git clone https://github.com/calleja/ass1_production.git /usr/src/app/PROJEC
 #may or may not need to add the listening port
 EXPOSE 5051
 
-ENTRYPOINT ["/bin/sh"]
+CMD [ "python3", "/usr/src/app/PROJECT_FOLDER/controller2.py" ]
